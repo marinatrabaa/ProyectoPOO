@@ -22,7 +22,7 @@ public class Reader extends User {
 
     @Override
     public void showType() {
-        System.out.println("User type: Reader, name: " + name);
+        System.out.println("User type: Reader, name: " + name + "limit: " +  limitLoans);
     }
     
 }

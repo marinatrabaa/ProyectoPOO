@@ -17,7 +17,7 @@ public abstract class User {
 
     public abstract void showType();
 
-    public String getNombre() {
+    public String getName() {
         return name;
     }
 

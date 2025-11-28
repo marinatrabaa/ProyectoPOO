@@ -2,16 +2,13 @@ package Library.resources;
 
 public class Magazine extends Resource {
 
-    private String edition;
-
-    public Magazine(String name, String id, String author, String edition){
+    public Magazine(String name, String id, String author){
         super(name, id, author);
-        this.edition = edition;
     }
 
     @Override
     public void showDetails() {
-        System.out.println("Author name: " + author + ", edition: " + edition);
+        System.out.println("Resource type: Magazine, author name: " + author);
     }
     
 }
