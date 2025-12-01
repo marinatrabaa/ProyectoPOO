@@ -35,5 +35,9 @@ public abstract class Resource {
     public String getId(){
         return id;
     }
+
+    public String getAuthor(){
+        return author;
+    }
     
 }

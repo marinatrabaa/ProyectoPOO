@@ -1,5 +1,7 @@
 package Library.Users;
 
+import Library.resources.Resource;
+
 public class Librarian extends User{
 
     private String turn;
@@ -16,15 +18,15 @@ public class Librarian extends User{
     public void setTurn(String newTurn){
         this.turn = newTurn;
     }
-
-    public void registerResource(){
-        System.out.println("Librarian: " + name + " is registring a resource");
+/* 
+    public void registerResource(Resource r){
+        System.out.println("Librarian: " + name + " is registring the resource " + r.getName());
     }
     
-    public void removeResource(){
-        System.out.println("Librarian: " + name + " is removing a resource");
+    public void removeResource(Resource r){
+        System.out.println("Librarian: " + name + " is removing the resource " + r.getName());
     }
-
+*/
     @Override
     public void showType() {
         System.out.println("User type: Librarian, name: " + name + ", turn: " + turn);

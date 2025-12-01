@@ -1,9 +1,7 @@
 package Library.lends;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
-import Library.collections.MyLinkedList;
 
 public class UserHistory{
 
@@ -11,8 +9,14 @@ public class UserHistory{
     //sin tocar solo esta puesto para que no pete el usuario lector
     protected int loans;
 
-    private MyLinkedList<Lend> activeLends = new MyLinkedList<>();
-    private MyLinkedList<Lend> finishedLends = new MyLinkedList<>();
+    private LinkedList<Lend> activeLends;
+    private LinkedList<Lend> finishedLends;
+
+    public UserHistory(){
+        activeLends = new LinkedList<>();
+        finishedLends = new LinkedList<>();
+    }
+
 
     public void addLend(Lend l){
         activeLends.add(l);
@@ -28,11 +32,11 @@ public class UserHistory{
         return activeLends.size();
     }
 
-    public MyLinkedList<Lend> getActiveLendList(){
+    public LinkedList<Lend> getActiveLendList(){
         return activeLends;
     }
 
-    public MyLinkedList<Lend> getFinishedLendList(){
+    public LinkedList<Lend> getFinishedLendList(){
         return finishedLends;
     }
 

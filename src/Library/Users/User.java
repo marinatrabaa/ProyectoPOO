@@ -30,7 +30,7 @@ public abstract class User {
     }
 
     //inner class for extra data
-    public class ContactData{
+    public static class ContactData{
         String email;
         String phoneNumber;
 

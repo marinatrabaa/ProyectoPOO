@@ -1,11 +1,11 @@
 package Library.services;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 
 import Library.Users.User;
-import Library.collections.MyLinkedList;
 import Library.resources.Resource;
 import Library.services.strategy.SearchStrategy;
 
@@ -21,7 +21,7 @@ public class LibraryManager {
         users = new HashMap<>();
     }
 
-    private LibraryManager getInstance(){
+    public static LibraryManager getInstance(){
         if(instance == null){
             return new LibraryManager();
         }
@@ -36,7 +36,15 @@ public class LibraryManager {
         cataloge.remove(id);
     }
 
-     public MyLinkedList<Resource> search(SearchStrategy strategy, String query) {
+    public Collection<User> getUsers(){
+        return users.values();
+    }
+
+    public Map<String, Resource> getCataloge(){
+        return cataloge;
+    }
+
+     public LinkedList<Resource> search(SearchStrategy strategy, String query) {
         return strategy.search(cataloge.values(), query);
     }
 

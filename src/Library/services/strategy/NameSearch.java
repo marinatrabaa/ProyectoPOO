@@ -1,16 +1,15 @@
 package Library.services.strategy;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
-import Library.collections.MyLinkedList;
 import Library.resources.Resource;
 
 public class NameSearch implements SearchStrategy {
 
     @Override
-    public MyLinkedList<Resource> search(Collection<Resource> resources, String query) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    public LinkedList<Resource> search(Collection<Resource> resources, String query) {
+        return new LinkedList<Resource> (resources.stream().filter(r -> r.getAuthor().contains(query.toLowerCase())).toList());
     }
     
 }
