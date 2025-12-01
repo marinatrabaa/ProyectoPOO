@@ -1,6 +1,9 @@
 package Library.services.scheduler;
 
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import Library.Users.Reader;
 import Library.Users.User;
@@ -19,19 +22,26 @@ public class ThreadsNotifier extends Thread{
     }
 
     public void run(){
-        while(true){
+
+        Set<Lend> notifiedLends = new HashSet<>();
+
+        while(!Thread.currentThread().isInterrupted()){
             try{
                 sleep(5000);
+                System.out.println("EJECUTANDO RUN DEL HILO");
 
                 for(User u: manager.getUsers()){
                     if (u instanceof Reader reader) {
-                    LinkedList<Lend> finished = reader.getHistory().getFinishedLendList();
-
-                    for (Lend l : finished) {
-                        notifier.sendEmail(l.getFinishDate(), reader.getName());
+                        for(Lend l : reader.getHistory().getFinishedLendList()){
+                            if(!notifiedLends.contains(l)){
+                                System.out.println("Hay prestamos finalizados. Name: " + l.getResource().getName() + 
+                                                    " | Reader: " + reader.getName());
+                                
+                            notifier.sendEmail(l.getFinishDate(), reader.getName());
+                            }
+                            notifiedLends.add(l);
+                        }
                     }
-                    }
-
                 }
             }catch (InterruptedException e){
                 break;

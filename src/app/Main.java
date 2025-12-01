@@ -22,6 +22,8 @@ public class Main {
 
         Reader reader = new Reader("Mario", "L001", new ContactData("mario@gmail.com", "987654212"));
         Librarian admin = new Librarian("Laura", "B001", new ContactData("laura@gmail.com", "123456787"), "mornings");
+        manager.addUser(reader);
+        manager.addUser(admin);
 
         Resource book1 = FactoryResource.createResource("book", "1984", "George Orwell", "001");
         Resource book2 = FactoryResource.createResource("book", "El Hobbit", "J.R.R. Tolkien", "002");
@@ -46,7 +48,8 @@ public class Main {
 
         // Lector intenta pedir prestado "1984"
         System.out.println("\nIntentando prestar '1984' a Mario...");
-        Lend l1 = new Lend(book1, reader); //no se que pasa con la clase reade
+        Lend l1 = new Lend(book1, reader);
+        Lend l3 = new Lend(magazine, reader);
         reader.getHistory().addLend(l1);
 
         if (l1 != null) {
@@ -85,7 +88,7 @@ public class Main {
 
         // IMPORTANTE: solo para pruebas, detener el hilo tras unos segundos
         try {
-            Thread.sleep(3000);
+            Thread.sleep(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

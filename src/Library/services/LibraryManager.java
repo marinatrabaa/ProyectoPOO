@@ -1,8 +1,10 @@
 package Library.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import Library.Users.User;
@@ -14,16 +16,16 @@ public class LibraryManager {
     private static LibraryManager instance;
 
     private Map<String, Resource> cataloge;
-    private Map<String, User> users;
+    private List<User> users;
 
     private LibraryManager(){
         cataloge = new HashMap<>();
-        users = new HashMap<>();
+        users = new ArrayList<>();
     }
 
     public static LibraryManager getInstance(){
         if(instance == null){
-            return new LibraryManager();
+            instance = new LibraryManager();
         }
         return instance;
     }
@@ -36,8 +38,12 @@ public class LibraryManager {
         cataloge.remove(id);
     }
 
-    public Collection<User> getUsers(){
-        return users.values();
+    public List<User> getUsers(){
+        return users;
+    }
+
+    public void addUser(User u){
+        users.add(u);
     }
 
     public Map<String, Resource> getCataloge(){
