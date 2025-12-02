@@ -46,10 +46,9 @@ public class Main {
 
         System.out.println("\n===  LENDS AND RETURNS ===");
 
-        // Lector intenta pedir prestado "1984"
-        System.out.println("\nIntentando prestar '1984' a Mario...");
+        //Reader tries to borrow "1984"
+        System.out.println("\nTrying to lend '1984' to Mario...");
         Lend l1 = new Lend(book1, reader);
-        Lend l3 = new Lend(magazine, reader);
         reader.getHistory().addLend(l1);
 
         if (l1 != null) {
@@ -60,42 +59,42 @@ public class Main {
             System.out.println("No se pudo realizar el préstamo.");
         }
 
-        // Intentar prestar un libro ya prestado
+        // Attempt to lend an already lent book
         System.out.println("\nTrying to lend same resource: '1984' a Mario...");
         if (!l1.isReturned()) {
-            System.out.println("Correcto: el sistema impidió prestar un libro ya prestado.");
+            System.out.println("Correct: the system prevented lending a book that is already lent.");
         }
 
-        // Devolución
-        System.out.println("\nDevolviendo '1984'...");
+        // Return
+        System.out.println("\nReturning '1984'...");
         l1.checkReturned();
         reader.getHistory().deleteLend(l1);
         if (l1.isReturned()) {
-            System.out.println("Devolución exitosa.");
+            System.out.println("Return successful.");
         } else {
-            System.out.println("Error al devolver el recurso.");
+            System.out.println("Error returning the resource.");
         }
 
-        // Ver historial del lector
-        System.out.println("\nHistorial de préstamos de Mario:");
+        // View reader's historys
+        System.out.println("\nmario's lending history:");
         reader.getHistory().getFinishedLendList().forEach(pr ->
             System.out.println(" - " + pr.getResource().getName() +
-                               " | devuelto: " + pr.isReturned()));
+                               " | returned: " + pr.isReturned()));
 
         System.out.println("\nStarting thread...");
         ThreadsNotifier thread = new ThreadsNotifier(manager, new Notifier());
         thread.start();
 
-        // IMPORTANTE: solo para pruebas, detener el hilo tras unos segundos
+        // IMPORTANT: only for testing, stop the thread after a few seconds
         try {
             Thread.sleep(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         thread.interrupt();
-        System.out.println("Hilo de recordatorios detenido.");
+        System.out.println("Reminder thread stopped.");
 
-        System.out.println("\n=== FIN DE LA DEMO ===");
+        System.out.println("\n=== END OF DEMO ===");
     }
 
 }

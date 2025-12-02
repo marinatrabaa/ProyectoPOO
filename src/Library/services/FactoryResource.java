@@ -10,7 +10,7 @@ public class FactoryResource {
         return switch (type.toLowerCase()) {
             case "book" -> new Book(id, name, author);
             case "magazine" -> new Magazine(name, id, author);
-            default -> throw new IllegalArgumentException("Tipo no soportado");
+            default -> throw new IllegalArgumentException("Type not soported");
         };
     }
     

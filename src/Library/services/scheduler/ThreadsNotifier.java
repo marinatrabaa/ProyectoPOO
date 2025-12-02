@@ -1,8 +1,6 @@
 package Library.services.scheduler;
 
-import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 import Library.Users.Reader;
@@ -28,13 +26,13 @@ public class ThreadsNotifier extends Thread{
         while(!Thread.currentThread().isInterrupted()){
             try{
                 sleep(5000);
-                System.out.println("EJECUTANDO RUN DEL HILO");
+                System.out.println("EXECUTING THREAD");
 
                 for(User u: manager.getUsers()){
                     if (u instanceof Reader reader) {
                         for(Lend l : reader.getHistory().getFinishedLendList()){
                             if(!notifiedLends.contains(l)){
-                                System.out.println("Hay prestamos finalizados. Name: " + l.getResource().getName() + 
+                                System.out.println("There are completed loans. Name: " + l.getResource().getName() + 
                                                     " | Reader: " + reader.getName());
                                 
                             notifier.sendEmail(l.getFinishDate(), reader.getName());

@@ -5,8 +5,6 @@ import java.util.LinkedList;
 
 public class UserHistory{
 
-
-    //sin tocar solo esta puesto para que no pete el usuario lector
     protected int loans;
 
     private LinkedList<Lend> activeLends;
@@ -28,10 +26,6 @@ public class UserHistory{
         }
     }
 
-    public int getNumberActiveLends(){
-        return activeLends.size();
-    }
-
     public LinkedList<Lend> getActiveLendList(){
         return activeLends;
     }
@@ -48,7 +42,7 @@ public class UserHistory{
         System.out.println("---- User History ----");
         System.out.println("Active:");
         activeLends.forEach(p -> System.out.println("  - " + p));
-        System.out.println("Finalizados:");
+        System.out.println("Ended:");
         finishedLends.forEach(p -> System.out.println("  - " + p));
     }
 

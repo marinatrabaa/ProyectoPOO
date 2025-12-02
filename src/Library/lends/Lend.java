@@ -17,7 +17,14 @@ public class Lend {
         this.resource = r;
         this.user = u;
         this.startDate = LocalDate.now();
-        this.finishDate = startDate.plusDays(15); //por defecto 15 days
+        this.finishDate = startDate.plusDays(15); //by default 15 days
+    }
+
+    public Lend(Resource r, User u, LocalDate start, LocalDate end){
+        this.resource = r;
+        this.user = u;
+        this.startDate = start;
+        this.finishDate = end;
     }
 
     public Resource getResource(){
@@ -40,10 +47,6 @@ public class Lend {
         return returned;
     }
 
-    public boolean isFinished(){
-        return !returned && LocalDate.now().isAfter(finishDate);
-    }
-
     public void checkReturned(){
         this.returned = true;
         resource.returnResource();;
@@ -51,11 +54,11 @@ public class Lend {
 
     @Override
     public String toString() {
-        return "Prestamo de " + resource.getName() + 
-               " a " + user.getName() +
-               " | Inicio: " + startDate + 
-               " | Vence: " + finishDate + 
-               " | Devuelto: " + returned;
+        return "Loan of " + resource.getName() + 
+               " to " + user.getName() +
+               " | Start: " + startDate + 
+               " | Due: " + finishDate + 
+               " | Returned: " + returned;
     }
 
 }
