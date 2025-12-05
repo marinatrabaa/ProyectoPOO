@@ -7,6 +7,7 @@ import Library.resources.Resource;
 
 public class Lend {
     
+    private int id;
     private Resource resource;
     private User user;
     private LocalDate startDate;
@@ -25,6 +26,14 @@ public class Lend {
         this.user = u;
         this.startDate = start;
         this.finishDate = end;
+    }
+
+    public int getId(){
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Resource getResource(){
@@ -61,4 +70,7 @@ public class Lend {
                " | Returned: " + returned;
     }
 
+    public void setReturned(boolean b) {
+        returned = b;
+    }
 }

@@ -39,5 +39,10 @@ public abstract class Resource {
     public String getAuthor(){
         return author;
     }
+
+    @Override
+    public String toString() {
+        return getName() + " by " + getAuthor() + " (id: " + getId() + ")";
+    }
     
 }

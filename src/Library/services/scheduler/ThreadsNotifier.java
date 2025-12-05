@@ -26,7 +26,7 @@ public class ThreadsNotifier extends Thread{
         while(!Thread.currentThread().isInterrupted()){
             try{
                 sleep(5000);
-                System.out.println("EXECUTING THREAD");
+                //System.out.println("EXECUTING THREAD");
 
                 for(User u: manager.getUsers()){
                     if (u instanceof Reader reader) {

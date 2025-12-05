@@ -1,7 +1,12 @@
 package app;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import Library.Users.Librarian;
 import Library.Users.Reader;
+import Library.Users.User;
 import Library.Users.User.ContactData;
 import Library.lends.Lend;
 import Library.resources.Resource;
@@ -11,6 +16,7 @@ import Library.services.Notifier;
 import Library.services.scheduler.ThreadsNotifier;
 import Library.services.strategy.AuthorSearch;
 import Library.services.strategy.NameSearch;
+import dao.LendDAO;
 
 public class Main {
 
@@ -46,10 +52,24 @@ public class Main {
 
         System.out.println("\n===  LENDS AND RETURNS ===");
 
+
+        List<User> userList = new ArrayList<>(manager.getUsers());
+        List<Resource> resourceList = new ArrayList<>(manager.getCataloge().values());
+        //Initiate DAO with users and resources lists
+        LendDAO lendDAO = new LendDAO(userList, resourceList);
+
         //Reader tries to borrow "1984"
         System.out.println("\nTrying to lend '1984' to Mario...");
         Lend l1 = new Lend(book1, reader);
+
+        //Save lend at reader's history and at db
         reader.getHistory().addLend(l1);
+        try {
+            lendDAO.addLend(l1);
+            System.out.println("Lend added at database.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         if (l1 != null) {
             System.out.println("New Lend added:");
@@ -69,6 +89,15 @@ public class Main {
         System.out.println("\nReturning '1984'...");
         l1.checkReturned();
         reader.getHistory().deleteLend(l1);
+
+        //Update db
+        try {
+            lendDAO.markAsReturned(l1);
+            System.out.println("Return updated in database.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         if (l1.isReturned()) {
             System.out.println("Return successful.");
         } else {
@@ -80,6 +109,15 @@ public class Main {
         reader.getHistory().getFinishedLendList().forEach(pr ->
             System.out.println(" - " + pr.getResource().getName() +
                                " | returned: " + pr.isReturned()));
+
+        // Load lends from db
+        try {
+            List<Lend> prestamosBD = lendDAO.getAllLends();
+            System.out.println("\nLends from database:");
+            prestamosBD.forEach(System.out::println);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("\nStarting thread...");
         ThreadsNotifier thread = new ThreadsNotifier(manager, new Notifier());

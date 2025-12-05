@@ -20,24 +20,60 @@ public class LendDAO {
         this.resources = resources;
     }
 
-    // Agrega un préstamo a la base de datos
+    // Add lend to data base
     public void addLend(Lend lend) throws SQLException {
-        String sql = "INSERT INTO lends (user_id, resource_id, start_date, finish_date, returned) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO lends (resource_id, user_id, start_date, finish_date, returned) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setString(1, lend.getUser().getId());
-            stmt.setString(2, lend.getResource().getId());
+            stmt.setString(1, lend.getResource().getId());
+            stmt.setString(2, lend.getUser().getId());
             stmt.setDate(3, Date.valueOf(lend.getStartDate()));
             stmt.setDate(4, Date.valueOf(lend.getFinishDate()));
             stmt.setBoolean(5, lend.isReturned());
 
-            stmt.executeUpdate();
+            int affected = stmt.executeUpdate();
+            try (ResultSet gk = stmt.getGeneratedKeys()) {
+                if (gk.next()) {
+                    int generatedId = gk.getInt(1);
+                    lend.setId(generatedId);
+                    System.out.println("DEBUG: addLend - generatedId = " + generatedId + ", affected=" + affected);
+                } else {
+                    System.out.println("DEBUG: addLend - no generated key returned, affected=" + affected);
+                }
+            }
         }
     }
 
-    // Obtiene todos los préstamos de la base de datos y reconstruye objetos usando listas en memoria
+    // Updates return state at database and object
+    public void markAsReturned(Lend lend) throws SQLException {
+        // 1. Tries to update by id if extists
+        if (lend.getId() > 0) {
+            String sql = "UPDATE lends SET returned = true WHERE id = ?";
+            try (Connection conn = DBConection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, lend.getId());
+                int rowsUpdated = stmt.executeUpdate();
+                System.out.println("DEBUG: markAsReturned - by id, ID: " + lend.getId() + ", Rows updated: " + rowsUpdated);
+            }
+        } else {
+            // Fallback: updates latest lend for that user+resource
+            String sql = "UPDATE lends SET returned = true WHERE resource_id = ? AND user_id = ? AND returned = 0 ORDER BY start_date DESC LIMIT 1";
+            try (Connection conn = DBConection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, lend.getResource().getId());
+                stmt.setString(2, lend.getUser().getId());
+                //int rowsUpdated = stmt.executeUpdate();
+                //System.out.println("DEBUG: markAsReturned - fallback by user+resource, Rows updated: " + rowsUpdated);
+            }
+        }
+
+        // 2. Updates object at memory
+        lend.setReturned(true);
+    }
+
+    // Obtains all lends at database and remakes objects using lists at memory
     public List<Lend> getAllLends() throws SQLException {
         List<Lend> lends = new ArrayList<>();
         String sql = "SELECT * FROM lends";
@@ -50,7 +86,6 @@ public class LendDAO {
                 String userId = rs.getString("user_id");
                 String resourceId = rs.getString("resource_id");
 
-                // Buscar usuario y recurso en las listas existentes
                 User user = users.stream()
                         .filter(u -> u.getId().equals(userId))
                         .findFirst()
@@ -61,33 +96,20 @@ public class LendDAO {
                         .findFirst()
                         .orElse(null);
 
-                if (user == null || resource == null) continue; // ignorar si no se encuentra
+                if (user == null || resource == null) continue; // ignore if not found
 
                 LocalDate startDate = rs.getDate("start_date").toLocalDate();
                 LocalDate finishDate = rs.getDate("finish_date").toLocalDate();
+                boolean returned = rs.getBoolean("returned");
 
-                // Usar el nuevo constructor que acepta fechas y estado
                 Lend lend = new Lend(resource, user, startDate, finishDate);
+                lend.setId(rs.getInt("id")); // asing id from db
+                lend.setReturned(returned); // asing directly the state from database
 
                 lends.add(lend);
             }
         }
 
         return lends;
-    }
-
-    // Actualiza el estado de devolución
-    public void markAsReturned(Lend lend) throws SQLException {
-        String sql = "UPDATE lends SET returned = ? WHERE user_id = ? AND resource_id = ? AND start_date = ?";
-        try (Connection conn = DBConection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setBoolean(1, lend.isReturned());
-            stmt.setString(2, lend.getUser().getId());
-            stmt.setString(3, lend.getResource().getId());
-            stmt.setDate(4, Date.valueOf(lend.getStartDate()));
-
-            stmt.executeUpdate();
-        }
     }
 }
