@@ -10,6 +10,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Data Access Object (DAO) for managing {@link Lend} entities in the database.
+ * Provides methods to add new lends, mark lends as returned, and retrieve
+ * all lends. Uses lists of {@link User} and {@link Resource} objects in memory
+ * to reconstruct the relationships.
+ */
 public class LendDAO {
 
     private List<User> users;
@@ -20,8 +27,13 @@ public class LendDAO {
         this.resources = resources;
     }
 
-    // Add lend to data base
-    public void addLend(Lend lend) throws SQLException {
+    /**
+     * Adds lend to a data base
+     * 
+     * @param lend
+     * @throws SQLException
+     */
+    public void addLend(Lend lend) throws SQLException, ClassNotFoundException {
         String sql = "INSERT INTO lends (resource_id, user_id, start_date, finish_date, returned) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConection.getConnection();
@@ -33,21 +45,25 @@ public class LendDAO {
             stmt.setDate(4, Date.valueOf(lend.getFinishDate()));
             stmt.setBoolean(5, lend.isReturned());
 
-            int affected = stmt.executeUpdate();
             try (ResultSet gk = stmt.getGeneratedKeys()) {
                 if (gk.next()) {
                     int generatedId = gk.getInt(1);
                     lend.setId(generatedId);
-                    System.out.println("DEBUG: addLend - generatedId = " + generatedId + ", affected=" + affected);
-                } else {
-                    System.out.println("DEBUG: addLend - no generated key returned, affected=" + affected);
                 }
+            } catch(SQLException e){
+                System.err.println("Error retrieving lends: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
 
-    // Updates return state at database and object
-    public void markAsReturned(Lend lend) throws SQLException {
+    /**
+     *Updates return state at database and object
+     * 
+     * @param lend
+     * @throws SQLException
+     */
+    public void markAsReturned(Lend lend) throws SQLException, ClassNotFoundException {
         // 1. Tries to update by id if extists
         if (lend.getId() > 0) {
             String sql = "UPDATE lends SET returned = true WHERE id = ?";
@@ -56,6 +72,9 @@ public class LendDAO {
                 stmt.setInt(1, lend.getId());
                 int rowsUpdated = stmt.executeUpdate();
                 System.out.println("DEBUG: markAsReturned - by id, ID: " + lend.getId() + ", Rows updated: " + rowsUpdated);
+            } catch(SQLException e){
+                System.err.println("Error retrieving lends: " + e.getMessage());
+                e.printStackTrace();
             }
         } else {
             // Fallback: updates latest lend for that user+resource
@@ -66,6 +85,9 @@ public class LendDAO {
                 stmt.setString(2, lend.getUser().getId());
                 //int rowsUpdated = stmt.executeUpdate();
                 //System.out.println("DEBUG: markAsReturned - fallback by user+resource, Rows updated: " + rowsUpdated);
+            } catch(SQLException e){
+                System.err.println("Error retrieving lends: " + e.getMessage());
+                e.printStackTrace();
             }
         }
 
@@ -73,8 +95,13 @@ public class LendDAO {
         lend.setReturned(true);
     }
 
-    // Obtains all lends at database and remakes objects using lists at memory
-    public List<Lend> getAllLends() throws SQLException {
+    /**
+     * Obtains all lends at database and remakes objects using lists at memory
+     * 
+     * @return all lends registered at database
+     * @throws SQLException
+     */
+    public List<Lend> getAllLends() throws SQLException, ClassNotFoundException {
         List<Lend> lends = new ArrayList<>();
         String sql = "SELECT * FROM lends";
 
@@ -108,6 +135,9 @@ public class LendDAO {
 
                 lends.add(lend);
             }
+        } catch (SQLException e){
+            System.err.println("Error retrieving lends: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return lends;
