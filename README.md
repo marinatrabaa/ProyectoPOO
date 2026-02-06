@@ -106,3 +106,82 @@ This project follows solid OOP principles:
 - **Design Patterns** to improve scalability and maintainability
 
 ---
+
+````mermaid
+classDiagram
+    class Resource {
+        <<abstract>>
+        -String id
+        -String title
+        -String author
+        +getId() String
+        +getTitle() String
+        +getAuthor() String
+    }
+
+    class Book {
+        -String isbn
+        +getIsbn() String
+    }
+
+    class Magazine {
+        -int number
+        +getNumber() int
+    }
+
+    class User {
+        -String id
+        -String name
+        -String email
+        +getId() String
+        +getName() String
+    }
+
+    class Lend {
+        -int id
+        -Resource resource
+        -User user
+        -LocalDate startDate
+        -LocalDate finishDate
+        -boolean returned
+        +isReturned() boolean
+        +setReturned(boolean)
+        +getResource() Resource
+        +getUser() User
+    }
+
+    class LendDAO {
+        -List~User~ users
+        -List~Resource~ resources
+        +LendDAO(List~User~, List~Resource~)
+        +addLend(Lend lend) void
+        +markAsReturned(Lend lend) void
+        +getAllLends() List~Lend~
+    }
+
+    class DBConection {
+        +getConnection() Connection$
+    }
+
+    class ReminderThread {
+        -LendDAO lendDAO
+        +ReminderThread(LendDAO)
+        +run() void
+        -checkExpirations() void
+        -sendEmail(User) void
+    }
+
+    class Main {
+        +main(String[] args)$
+        -initializeData() void
+    }
+
+    Resource <|-- Book
+    Resource <|-- Magazine
+    Lend "1" --> "1" User
+    Lend "1" --> "1" Resource
+    LendDAO ..> Lend : manipulates
+    LendDAO ..> DBConection : uses
+    ReminderThread --> LendDAO : queries
+    Main ..> Librarian : interacts
+    Main ..> LendDAO : invokes
