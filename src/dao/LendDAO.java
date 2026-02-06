@@ -34,28 +34,27 @@ public class LendDAO {
      * @throws SQLException
      */
     public void addLend(Lend lend) throws SQLException, ClassNotFoundException {
-        String sql = "INSERT INTO lends (resource_id, user_id, start_date, finish_date, returned) VALUES (?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO lends (resource_id, user_id, start_date, finish_date, returned) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = DBConection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    try (Connection conn = DBConection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setString(1, lend.getResource().getId());
-            stmt.setString(2, lend.getUser().getId());
-            stmt.setDate(3, Date.valueOf(lend.getStartDate()));
-            stmt.setDate(4, Date.valueOf(lend.getFinishDate()));
-            stmt.setBoolean(5, lend.isReturned());
+        stmt.setString(1, lend.getResource().getId());
+        stmt.setString(2, lend.getUser().getId());
+        stmt.setDate(3, Date.valueOf(lend.getStartDate()));
+        stmt.setDate(4, Date.valueOf(lend.getFinishDate()));
+        stmt.setBoolean(5, lend.isReturned());
 
-            try (ResultSet gk = stmt.getGeneratedKeys()) {
-                if (gk.next()) {
-                    int generatedId = gk.getInt(1);
-                    lend.setId(generatedId);
-                }
-            } catch(SQLException e){
-                System.err.println("Error retrieving lends: " + e.getMessage());
-                e.printStackTrace();
+        stmt.executeUpdate(); 
+
+        try (ResultSet gk = stmt.getGeneratedKeys()) {
+            if (gk.next()) {
+                int generatedId = gk.getInt(1);
+                lend.setId(generatedId);
             }
         }
     }
+}
 
     /**
      *Updates return state at database and object

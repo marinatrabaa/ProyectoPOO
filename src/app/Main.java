@@ -97,7 +97,7 @@ public class Main {
             System.out.println(" - Resource: " + l1.getResource().getName());
             System.out.println(" - Limit Date: " + l1.getFinishDate());
         } else {
-            System.out.println("No se pudo realizar el préstamo.");
+            System.out.println("Lend could not be done.");
         }
 
         // Attempt to lend an already lent book
