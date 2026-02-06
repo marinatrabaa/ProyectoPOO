@@ -73,19 +73,20 @@ ProyectoPOO/
    - Eclipse
    - NetBeans
 3. Configure the database connection in:
+   
    ```
    src/db/DBConection.java
    ```
 4. Add required JAR files to the project build path.
 5. Execution via Terminal:
-  Compile the project
-  ```powershell
-  javac -cp ".;lib/mysql-connector-j-8.0.33.jar" -d bin src/app/Main.java
-  ```
-  Run the application
-  ```powershell
-  java -cp "bin;lib/mysql-connector-j-8.0.33.jar" app.Main
-  ```
+    Compile the project
+    ```powershell
+    javac -cp ".;lib/mysql-connector-j-8.0.33.jar" -d bin src/app/Main.java
+    ```
+    Run the application
+    ```powershell
+    java -cp "bin;lib/mysql-connector-j-8.0.33.jar" app.Main
+    ```
 
 ---
 
@@ -135,6 +136,7 @@ graph LR
     UC3 --- DB
     UC5 --- DB
 ````
+---
 
 ## Class Diagram
 ````mermaid
@@ -216,6 +218,8 @@ classDiagram
     Main ..> Librarian : interacts
     Main ..> LendDAO : invokes
 ````
+---
+
 ## Sequence Diagram
 ```mermaid
 sequenceDiagram
