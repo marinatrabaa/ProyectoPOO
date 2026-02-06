@@ -186,6 +186,11 @@ classDiagram
     Main ..> Librarian : interacts
     Main ..> LendDAO : invokes
 ````
+
+
+
+
+
 ```mermaid
 sequenceDiagram
     autonumber
