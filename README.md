@@ -77,10 +77,17 @@ ProyectoPOO/
    src/db/DBConection.java
    ```
 4. Add required JAR files to the project build path.
-5. Run the application from:
+5. Execution via Terminal:
    ```
-   src/app/Main.java
-   ```
+  Compile the project
+  ```powershell
+  javac -cp ".;lib/mysql-connector-j-8.0.33.jar" -d bin src/app/Main.java
+  ```
+  Run the application
+  ```powershell
+  java -cp "bin;lib/mysql-connector-j-8.0.33.jar" app.Main
+  ```
+  ```
 
 ---
 
