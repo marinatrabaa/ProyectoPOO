@@ -107,6 +107,7 @@ This project follows solid OOP principles:
 
 ---
 
+# Class diagram
 ````mermaid
 classDiagram
     class Resource {
@@ -186,11 +187,7 @@ classDiagram
     Main ..> Librarian : interacts
     Main ..> LendDAO : invokes
 ````
-
-
-
-
-
+## Sequence diagram
 ```mermaid
 sequenceDiagram
     autonumber
