@@ -81,11 +81,11 @@ ProyectoPOO/
 5. Execution via Terminal:
     Compile the project
     ```powershell
-    javac -cp ".;lib/mysql-connector-j-8.0.33.jar" -d bin src/app/Main.java
+    javac -cp "lib/mysql-connector-j-9.5.0.jar" -d bin src/app/Main.java src/dao/*.java src/db/*.java src/Library/lends/*.java src/Library/resources/*.java src/Library/services/*.java             src/Library/services/strategy/*.java src/Library/services/scheduler/*.java src/Library/Users/*.java
     ```
     Run the application
     ```powershell
-    java -cp "bin;lib/mysql-connector-j-8.0.33.jar" app.Main
+    java -cp "bin;lib/mysql-connector-j-9.5.0.jar" app.Main
     ```
 
 ---
