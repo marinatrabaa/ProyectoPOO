@@ -107,7 +107,31 @@ This project follows solid OOP principles:
 
 ---
 
-# Class diagram
+## Use Case Diagram
+```mermaid
+graph LR
+    subgraph "Library System"
+        UC1(Manage Resources)
+        UC2(Lend Resource)
+        UC3(Return Resource)
+        UC4(Register User)
+        UC5(Send Notifications)
+    end
+
+    Librarian((Librarian)) --- UC1
+    Librarian --- UC2
+    Librarian --- UC3
+    Librarian --- UC4
+
+    Reader((Reader)) --- UC2
+    Reader --- UC3
+
+    UC2 --- DB[(Database)]
+    UC3 --- DB
+    UC5 --- DB
+````
+
+## Class Diagram
 ````mermaid
 classDiagram
     class Resource {
@@ -187,7 +211,7 @@ classDiagram
     Main ..> Librarian : interacts
     Main ..> LendDAO : invokes
 ````
-## Sequence diagram
+## Sequence Diagram
 ```mermaid
 sequenceDiagram
     autonumber
