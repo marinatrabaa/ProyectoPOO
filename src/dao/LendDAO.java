@@ -17,7 +17,7 @@ import java.util.List;
  * all lends. Uses lists of {@link User} and {@link Resource} objects in memory
  * to reconstruct the relationships.
  */
-public class LendDAO {
+public class LendDAO{
 
     private List<User> users;
     private List<Resource> resources;
