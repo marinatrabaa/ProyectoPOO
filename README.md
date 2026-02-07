@@ -141,82 +141,154 @@ graph LR
 ## Class Diagram
 ````mermaid
 classDiagram
+    %% --- PAQUETE: DB Y DAO ---
+    class DBConection {
+        -String USER$
+        -String PASS$
+        +getConnection() Connection
+    }
+    class LendDAO {
+        -List<User> users
+        -List<Resource> resources
+        +addLend(Lend)
+        +markAsReturned(Lend)
+        +getAllLends() List<Lend>
+    }
+
+    %% --- PAQUETE: USERS ---
+    class User {
+        <<abstract>>
+        #String id
+        #String name
+		#ContactData data
+		#UserHistory history
+		+showType()*
+    }
+	
+	class ContactData {
+        <<static>>
+        -String email
+        -String telefono
+        +ContactData(String, String)
+        +getEmail() String
+        +getTelefono() String
+        +toString() String
+    }
+	
+    class Librarian {
+        -String turn
+        +showType()
+    }
+    class Reader {
+        -int limitLoans
+		-UserHistory history
+		+showType()
+    }
+
+    %% --- PAQUETE: RESOURCES ---
     class Resource {
         <<abstract>>
-        -String id
-        -String title
-        -String author
-        +getId() String
-        +getTitle() String
-        +getAuthor() String
+        #String id
+        #String title
+        #String author
+		#boolean free
+		+showDetails()*
+		+isFree() boolean
+		+lendResource()
+		+returnResource()
     }
-
     class Book {
-        -String isbn
-        +getIsbn() String
+        +showDetails()
     }
-
     class Magazine {
-        -int number
-        +getNumber() int
+        +showDetails()
     }
 
-    class User {
-        -String id
-        -String name
-        -String email
-        +getId() String
-        +getName() String
-    }
-
+    %% --- PAQUETE: LENDS ---
     class Lend {
         -int id
         -Resource resource
         -User user
-        -LocalDate startDate
+        -LocalDate startdate
         -LocalDate finishDate
         -boolean returned
         +isReturned() boolean
-        +setReturned(boolean)
-        +getResource() Resource
-        +getUser() User
+        +checkReturned()
+    }
+    class UserHistory {
+        #int loans
+        -LinkedList<Lend> activeLends
+        -LinkedList<Lend> finishedLends
+        +addLend(Lend l)
+        +deleteLend(Lend)
+        +showHistory()
     }
 
-    class LendDAO {
-        -List~User~ users
-        -List~Resource~ resources
-        +LendDAO(List~User~, List~Resource~)
-        +addLend(Lend lend) void
-        +markAsReturned(Lend lend) void
-        +getAllLends() List~Lend~
+    %% --- PAQUETE: SERVICES & STRATEGY ---
+    class LibraryManager {
+        -LibraryManager instance
+        -Map<String, Resource> cataloge
+		-List<User> users
+        +getinstance()$ LibraryManager
+        +addResource(Resource)
+		+removeResource(String)
+		+addUser(User)
+		+search(SearchStrategy, String query) LinkedList<Resource>
     }
-
-    class DBConection {
-        +getConnection() Connection$
+    class FactoryResource {
+        +createResource(String, String, String, String) Resource
     }
-
-    class ReminderThread {
-        -LendDAO lendDAO
-        +ReminderThread(LendDAO)
-        +run() void
-        -checkExpirations() void
-        -sendEmail(User) void
+    class SearchStrategy {
+        <<interface>>
+        +search(Collection<Resource>, String) LinkedList<Resource>
+    }
+    class AuthorSearch{
+		+search(Collection<Resource>, String) LinkedList<Resource>
+	}
+    class NameSearch{
+		search(Collection<Resource>, String) LinkedList<Resource>
+		}
+    
+    class Notifier {
+        +sendEmail(LocalDate, String)
+    }
+    class ThreadsNotifier {
+        +run()
     }
 
     class Main {
         +main(String[] args)$
-        -initializeData() void
     }
 
+    %% --- RELACIONES DE HERENCIA Y REALIZACIÓN ---
+    User <|-- Librarian
+    User <|-- Reader
     Resource <|-- Book
     Resource <|-- Magazine
-    Lend "1" --> "1" User
-    Lend "1" --> "1" Resource
-    LendDAO ..> Lend : manipulates
-    LendDAO ..> DBConection : uses
-    ReminderThread --> LendDAO : queries
-    Main ..> Librarian : interacts
-    Main ..> LendDAO : invokes
+    SearchStrategy <|.. AuthorSearch
+    SearchStrategy <|.. NameSearch
+
+    %% --- RELACIONES DE ASOCIACIÓN Y USO (CONEXIÓN TOTAL) ---
+    Main --> LibraryManager : initializes
+    Main --> DBConection : configures
+    
+    LibraryManager o-- Resource : inventory
+    LibraryManager o-- User : members
+    LibraryManager --> LendDAO : persists data
+    LibraryManager --> SearchStrategy : uses
+    LibraryManager --> FactoryResource : requests creation
+    
+    LendDAO --> DBConection : uses
+    Lend "*" --> "1" User : associated to
+    Lend "*" --> "1" Resource : involves
+    UserHistory "1" o-- "*" Lend : aggregates
+    
+    ThreadsNotifier --> Notifier : uses
+	
+	%% Relación de clase anidada
+    User *-- ContactData : nested
+    %% Relación con el historial
+    User --> UserHistory : manages
 ````
 ---
 
