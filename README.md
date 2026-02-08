@@ -165,8 +165,8 @@ graph LR
 ````
 ---
 
-classDiagram
 ```mermaid
+classDiagram
     %% --- PAQUETE: DB Y DAO ---
     class DBConection {
         -String USER$
