@@ -181,6 +181,14 @@ classDiagram
         +markAsReturned(Lend)
         +getAllLends() List<Lend>
     }
+	class UserDAO{
+		+saveUser(User)
+		+getAllUsers() List<User>
+	}
+	class ResourceDAO{
+		+saveResource(Resource)
+		+getAllResources() List<Resource>
+	}
 
     %% --- PAQUETE: USERS ---
     class User {
