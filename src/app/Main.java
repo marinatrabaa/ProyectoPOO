@@ -17,6 +17,8 @@ import Library.services.scheduler.ThreadsNotifier;
 import Library.services.strategy.AuthorSearch;
 import Library.services.strategy.NameSearch;
 import dao.LendDAO;
+import dao.ResourceDAO;
+import dao.UserDAO;
 
 /**
  * Main class for demonstrating the Library Management System.
@@ -43,16 +45,21 @@ public class Main {
      * notification thread.
      *
      * @param args command-line arguments (not used)
+     * @throws ClassNotFoundException 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException {
 
         LibraryManager manager = LibraryManager.getInstance();
+
+        UserDAO userDAO = new UserDAO();
+        ResourceDAO resourceDAO = new ResourceDAO();
 
         System.out.println("-- START OF LIBRARY SYSTEM --");
 
         // Users
         Reader reader = new Reader("Mario", "L001", new ContactData("mario@gmail.com", "987654212"));
         Librarian admin = new Librarian("Laura", "B001", new ContactData("laura@gmail.com", "123456787"), "mornings");
+        userDAO.saveUser(reader);
         manager.addUser(reader);
         manager.addUser(admin);
 
@@ -60,6 +67,7 @@ public class Main {
         Resource book1 = FactoryResource.createResource("book", "1984", "George Orwell", "001");
         Resource book2 = FactoryResource.createResource("book", "El Hobbit", "J.R.R. Tolkien", "002");
         Resource magazine = FactoryResource.createResource("magazine", "National Geographic", "company", "003");
+        
         manager.addResource(book1);
         manager.addResource(book2);
         manager.addResource(magazine);
@@ -88,6 +96,13 @@ public class Main {
         try {
             lendDAO.addLend(l1);
             System.out.println("Lend added at database.");
+            userDAO.saveUser(reader);
+            userDAO.saveUser(admin);
+            System.out.println("User added at database.");
+            resourceDAO.saveResource(magazine);
+            resourceDAO.saveResource(book1);
+            resourceDAO.saveResource(book2);
+            System.out.println("Resource added at database.");
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
@@ -131,12 +146,27 @@ public class Main {
             System.out.println(" - " + pr.getResource().getName() +
                                " | returned: " + pr.isReturned()));
 
-        // Load lends from db
+        // DATABASE
+        // 1. Users
+        try {
+            userDAO.getAllUsers();
+        } catch (Exception e) {
+            System.out.println("Error consultando usuarios: " + e.getMessage());
+        }
+
+        // 2. Resources
+        try {
+            resourceDAO.getAllResources();
+        } catch (Exception e) {
+            System.out.println("Error consultando recursos: " + e.getMessage());
+        }
+
+        // 3. Lends
         try {
             List<Lend> prestamosBD = lendDAO.getAllLends();
             System.out.println("\nLends from database:");
             prestamosBD.forEach(System.out::println);
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
