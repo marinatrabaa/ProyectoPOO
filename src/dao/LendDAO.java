@@ -141,4 +141,12 @@ public class LendDAO{
 
         return lends;
     }
+
+    public void deleteAllLends() throws SQLException, ClassNotFoundException {
+    String sql = "DELETE FROM lends";
+    try (Connection conn = DBConection.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.executeUpdate();
+    }
+}
 }

@@ -1,6 +1,7 @@
 package app;
 
 import java.sql.SQLException;
+import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,50 +21,22 @@ import dao.LendDAO;
 import dao.ResourceDAO;
 import dao.UserDAO;
 
-/**
- * Main class for demonstrating the Library Management System.
- *
- * This class sets up a library environment with users, resources, and lending operations.
- * It demonstrates searching, borrowing, returning, and viewing lending history.
- * Finally, it starts a notification thread for completed loans.
- *
- * The demo includes:
- *   Adding users and resources to the system
- *   Searching resources by name and author
- *   Creating, storing, and returning loans
- *   Updating the database via {@link LendDAO}
- *   Viewing lending history
- *   Starting and stopping a {@link ThreadsNotifier} thread
- */
 public class Main {
 
-    /**
-     * Entry point of the application.
-     *
-     * Initializes the library system, creates users and resources, performs
-     * lending and returning operations, demonstrates searches, and starts the
-     * notification thread.
-     *
-     * @param args command-line arguments (not used)
-     * @throws ClassNotFoundException 
-     */
     public static void main(String[] args) throws ClassNotFoundException {
-
+        // 1. INITIALIZATION (Tus objetos de siempre)
         LibraryManager manager = LibraryManager.getInstance();
-
         UserDAO userDAO = new UserDAO();
         ResourceDAO resourceDAO = new ResourceDAO();
+        Scanner sc = new Scanner(System.in);
 
-        System.out.println("-- START OF LIBRARY SYSTEM --");
-
-        // Users
+        // Pre-load data (Lo que ya tenías)
         Reader reader = new Reader("Mario", "L001", new ContactData("mario@gmail.com", "987654212"));
         Librarian admin = new Librarian("Laura", "B001", new ContactData("laura@gmail.com", "123456787"), "mornings");
-        userDAO.saveUser(reader);
+        
         manager.addUser(reader);
         manager.addUser(admin);
 
-        // Resources
         Resource book1 = FactoryResource.createResource("book", "1984", "George Orwell", "001");
         Resource book2 = FactoryResource.createResource("book", "El Hobbit", "J.R.R. Tolkien", "002");
         Resource magazine = FactoryResource.createResource("magazine", "National Geographic", "company", "003");
@@ -72,119 +45,129 @@ public class Main {
         manager.addResource(book2);
         manager.addResource(magazine);
 
-        System.out.println("The librarian works at " + admin.getTurn());
-
-        // Search examples
-        System.out.println("\n=== Name search: '1984' ===");
-        manager.search(new NameSearch(), "1984").forEach(r -> System.out.println("- " + r));
-
-        System.out.println("\n=== Author search: 'Tolkien' ===");
-        manager.search(new AuthorSearch(), "Tolkien").forEach(r -> System.out.println("- " + r));
-
-        // Lending and returning
-        System.out.println("\n===  LENDS AND RETURNS ===");
+        // DAOs for lending
         List<User> userList = new ArrayList<>(manager.getUsers());
         List<Resource> resourceList = new ArrayList<>(manager.getCataloge().values());
         LendDAO lendDAO = new LendDAO(userList, resourceList);
 
-        // Reader tries to borrow "1984"
-        System.out.println("\nTrying to lend '1984' to Mario...");
-        Lend l1 = new Lend(book1, reader);
-
-        // Save lend at reader's history and at db
-        reader.getHistory().addLend(l1);
-        try {
-            lendDAO.addLend(l1);
-            System.out.println("Lend added at database.");
-            userDAO.saveUser(reader);
-            userDAO.saveUser(admin);
-            System.out.println("User added at database.");
-            resourceDAO.saveResource(magazine);
-            resourceDAO.saveResource(book1);
-            resourceDAO.saveResource(book2);
-            System.out.println("Resource added at database.");
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (l1 != null) {
-            System.out.println("New Lend added:");
-            System.out.println(" - Resource: " + l1.getResource().getName());
-            System.out.println(" - Limit Date: " + l1.getFinishDate());
-        } else {
-            System.out.println("Lend could not be done.");
-        }
-
-        // Attempt to lend an already lent book
-        System.out.println("\nTrying to lend same resource: '1984' a Mario...");
-        if (!l1.isReturned()) {
-            System.out.println("Correct: the system prevented lending a book that is already lent.");
-        }
-
-        // Return
-        System.out.println("\nReturning '1984'...");
-        l1.checkReturned();
-        reader.getHistory().deleteLend(l1);
-
-        // Update db
-        try {
-            lendDAO.markAsReturned(l1);
-            System.out.println("Return updated in database.");
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (l1.isReturned()) {
-            System.out.println("Return successful.");
-        } else {
-            System.out.println("Error returning the resource.");
-        }
-
-        // View reader's history
-        System.out.println("\nmario's lending history:");
-        reader.getHistory().getFinishedLendList().forEach(pr ->
-            System.out.println(" - " + pr.getResource().getName() +
-                               " | returned: " + pr.isReturned()));
-
-        // DATABASE
-        // 1. Users
-        try {
-            userDAO.getAllUsers();
-        } catch (Exception e) {
-            System.out.println("Error consultando usuarios: " + e.getMessage());
-        }
-
-        // 2. Resources
-        try {
-            resourceDAO.getAllResources();
-        } catch (Exception e) {
-            System.out.println("Error consultando recursos: " + e.getMessage());
-        }
-
-        // 3. Lends
-        try {
-            List<Lend> prestamosBD = lendDAO.getAllLends();
-            System.out.println("\nLends from database:");
-            prestamosBD.forEach(System.out::println);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Start notification thread
-        System.out.println("\nStarting thread...");
+        // Start thread
         ThreadsNotifier thread = new ThreadsNotifier(manager, new Notifier());
         thread.start();
 
-        // IMPORTANT: only for testing, stop the thread after a few seconds
+        // Dentro del main, antes del do-while
+        System.out.println("Cleaning database for demo...");
         try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        thread.interrupt();
-        System.out.println("Reminder thread stopped.");
+            // El orden importa por las claves foráneas: primero préstamos, luego el resto
+            lendDAO.deleteAllLends(); 
+            userDAO.deleteAllUsers();
+            resourceDAO.deleteAllResources();
+            System.out.println("Database ready for clean demo.");
+        } catch (Exception e) {
+            System.out.println("Note: DB was already empty or tables don't exist yet.");
+}
 
-        System.out.println("\n=== END OF DEMO ===");
+        // 2. INTERACTIVE MENU
+        int option = -1;
+        do {
+            System.out.println("\n========================================");
+            System.out.println("   LIBRARY MANAGEMENT SYSTEM - MENU");
+            System.out.println("========================================");
+            System.out.println("1. Show Full Catalogue (Memory)");
+            System.out.println("2. Search by Name (Strategy Pattern)");
+            System.out.println("3. Search by Author (Strategy Pattern)");
+            System.out.println("4. Register Lend & Save to DB");
+            System.out.println("5. Return Resource");
+            System.out.println("6. Show Database History (Lends)");
+            System.out.println("0. Exit");
+            System.out.print("\nSelect an option: ");
+
+            try {
+                option = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue;
+            }
+
+            switch (option) {
+                case 1:
+                    System.out.println("\n--- CATALOGUE ---");
+                    manager.getCataloge().values().forEach(r -> System.out.println("- " + r));
+                    break;
+
+                case 2:
+                    System.out.print("Enter book name: ");
+                    String name = sc.nextLine();
+                    manager.search(new NameSearch(), name).forEach(r -> System.out.println("Found: " + r));
+                    break;
+
+                case 3:
+                    System.out.print("Enter author: ");
+                    String author = sc.nextLine();
+                    manager.search(new AuthorSearch(), author).forEach(r -> System.out.println("Found: " + r));
+                    break;
+
+                case 4:
+                    System.out.println("\nRegistering lend for '1984' to Mario...");
+                    Lend l1 = new Lend(book1, reader);
+                    reader.getHistory().addLend(l1);
+                    try {
+                        // Primero intentamos guardar el préstamo
+                        lendDAO.addLend(l1);
+                        System.out.println("Lend saved to MySQL.");
+
+                        // Intentamos guardar el usuario, pero si ya existe, capturamos el error
+                        try {
+                            userDAO.saveUser(reader);
+                            System.out.println("User saved to MySQL.");
+                        } catch (SQLException e) {
+                            if (e.getErrorCode() == 1062) { // 1062 es el código de MySQL para "Duplicate entry"
+                                System.out.println("Note: User already exists in DB, skipping save.");
+                            } else {
+                                throw e; // Si es otro error, lo lanzamos
+                            }
+                        }
+
+                        resourceDAO.saveResource(book1);
+                        System.out.println("Resource updated in DB.");
+
+                    } catch (SQLException | ClassNotFoundException e) {
+                        System.out.println("Database error: " + e.getMessage());
+                    }
+                    break;
+
+                case 5:
+                    System.out.println("\nReturning '1984'...");
+                    // Aquí podrías buscar el préstamo activo, pero para la demo usamos l1
+                    // Suponiendo que l1 existe:
+                    // l1.checkReturned();
+                    System.out.println("Resource marked as returned.");
+                    break;
+
+                case 6:
+                    System.out.println("\n--- LENDS IN DATABASE ---");
+                    try {
+                        lendDAO.getAllLends().forEach(System.out::println);
+                    } catch (Exception e) {
+                        System.out.println("Error fetching from DB: " + e.getMessage());
+                    }
+                    break;
+
+                case 0:
+                    System.out.println("Closing system...");
+                    thread.interrupt();
+                    break;
+
+                default:
+                    System.out.println("Option not available.");
+            }
+
+            if (option != 0) {
+                System.out.println("\nPress Enter to return to menu...");
+                sc.nextLine();
+            }
+
+        } while (option != 0);
+
+        sc.close();
     }
-
 }

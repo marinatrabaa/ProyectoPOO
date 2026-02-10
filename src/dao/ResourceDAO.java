@@ -59,4 +59,13 @@ public class ResourceDAO {
     }
     return resources;
 }
+
+    public void deleteAllResources() throws SQLException, ClassNotFoundException {
+    String sql = "DELETE FROM resources";
+    try (Connection conn = DBConection.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.executeUpdate();
+    }
+}
+
 }

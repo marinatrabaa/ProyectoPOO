@@ -12,7 +12,7 @@ import Library.Users.User;
 import db.DBConection;
 
 public class UserDAO {
-    public void saveUser(User user) throws ClassNotFoundException {
+    public void saveUser(User user) throws ClassNotFoundException , SQLException{
         String sql = "INSERT INTO users (id, name, email, type) VALUES (?, ?, ?, ?)";
         
         try (Connection conn = DBConection.getConnection();
@@ -57,4 +57,11 @@ public class UserDAO {
     }
     return users;
 }
+    public void deleteAllUsers() throws SQLException, ClassNotFoundException {
+        String sql = "DELETE FROM users";
+        try (Connection conn = DBConection.getConnection(); // Usa tu método de conexión
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.executeUpdate();
+        }
+    }
 }
