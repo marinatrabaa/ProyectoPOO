@@ -48,6 +48,8 @@ ProyectoPOO/
 │   │
 │   ├── dao/                # Data Access Objects
 │   │   └── LendDAO.java
+|   |   └── UserDAO.java
+|   |   └── ResourceDAO.java
 │   │
 │   ├── db/                 # Database connection
 │   │   └── DBConection.java
