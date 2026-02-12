@@ -12,9 +12,9 @@ import Library.services.Notifier;
  * Thread that periodically checks for completed loans in the library system
  * and notifies readers via a {@link Notifier}.
  *
- * <p>Every 5 seconds, this thread scans all users, identifies finished loans,
+ * Every 5 seconds, this thread scans all users, identifies finished loans,
  * and if they have not been notified yet, prints a message to the console and
- * sends an email notification.</p>
+ * sends an email notification.
  */
 public class ThreadsNotifier extends Thread {
 
@@ -35,9 +35,9 @@ public class ThreadsNotifier extends Thread {
     /**
      * The main thread task.
      *
-     * <p>Runs in a loop until the thread is interrupted. Every 5 seconds,
+     * Runs in a loop until the thread is interrupted. Every 5 seconds,
      * it checks all readers for finished loans. If a loan has not been notified yet,
-     * it prints a message and sends an email via {@code notifier}.</p>
+     * it prints a message and sends an email via {@code notifier}.
      */
     @Override
     public void run() {

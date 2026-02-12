@@ -32,6 +32,7 @@ public class LendDAO{
      * 
      * @param lend
      * @throws SQLException
+     * @throws ClassNotFoundException
      */
     public void addLend(Lend lend) throws SQLException, ClassNotFoundException {
     String sql = "INSERT INTO lends (resource_id, user_id, start_date, finish_date, returned) VALUES (?, ?, ?, ?, ?)";
@@ -61,6 +62,7 @@ public class LendDAO{
      * 
      * @param lend
      * @throws SQLException
+     * @throws ClassNotFoundException
      */
     public void markAsReturned(Lend lend) throws SQLException, ClassNotFoundException {
         // 1. Tries to update by id if extists
@@ -99,6 +101,7 @@ public class LendDAO{
      * 
      * @return all lends registered at database
      * @throws SQLException
+     * @throws ClassNotFoundException
      */
     public List<Lend> getAllLends() throws SQLException, ClassNotFoundException {
         List<Lend> lends = new ArrayList<>();
@@ -142,6 +145,13 @@ public class LendDAO{
         return lends;
     }
 
+    /**
+     * Deletes all records from the "lends" table in the database.
+     * @throws SQLException If a database access error occurs or the SQL 
+     * statement is invalid.
+     * @throws ClassNotFoundException If the JDBC driver class cannot be located 
+     * while establishing the connection.
+     */
     public void deleteAllLends() throws SQLException, ClassNotFoundException {
     String sql = "DELETE FROM lends";
     try (Connection conn = DBConection.getConnection();

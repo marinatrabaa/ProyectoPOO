@@ -20,7 +20,6 @@ public class FactoryResource {
      * @param author the resource author
      * @param id     the unique identifier of the resource
      * @return a new {@link Resource} instance matching the given type
-     * @throws IllegalArgumentException if the resource type is not supported
      */
     public static Resource createResource(String type, String name, String author, String id) {
         return switch (type.toLowerCase()) {

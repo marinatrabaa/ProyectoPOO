@@ -11,7 +11,7 @@ public class Notifier {
     /**
      * Sends an email notification to a user indicating the date on which
      * their loan was completed.
-     * <p>
+     *
      * This implementation currently prints the message to the console instead of
      * sending a real email.
      *

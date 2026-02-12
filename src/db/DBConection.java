@@ -25,7 +25,6 @@ public class DBConection {
      * @return a {@link Connection} object connected to the database
      * @throws SQLException if a database access error occurs
      * @throws ClassNotFoundException if the MySQL JDBC driver class is not found
-     * @throws RuntimeException if the driver cannot be loaded or the connection cannot be established
      */
     public static Connection getConnection() throws SQLException, ClassNotFoundException{
         try {

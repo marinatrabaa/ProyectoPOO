@@ -24,13 +24,13 @@ import dao.UserDAO;
 public class Main {
 
     public static void main(String[] args) throws ClassNotFoundException {
-        // 1. INITIALIZATION (Tus objetos de siempre)
+        // 1. INITIALIZATION 
         LibraryManager manager = LibraryManager.getInstance();
         UserDAO userDAO = new UserDAO();
         ResourceDAO resourceDAO = new ResourceDAO();
         Scanner sc = new Scanner(System.in);
 
-        // Pre-load data (Lo que ya tenías)
+        // Pre-load data 
         Reader reader = new Reader("Mario", "L001", new ContactData("mario@gmail.com", "987654212"));
         Librarian admin = new Librarian("Laura", "B001", new ContactData("laura@gmail.com", "123456787"), "mornings");
         
@@ -50,14 +50,14 @@ public class Main {
         List<Resource> resourceList = new ArrayList<>(manager.getCataloge().values());
         LendDAO lendDAO = new LendDAO(userList, resourceList);
 
+        Lend l1 = new Lend(book1, reader);
+
         // Start thread
         ThreadsNotifier thread = new ThreadsNotifier(manager, new Notifier());
         thread.start();
 
-        // Dentro del main, antes del do-while
         System.out.println("Cleaning database for demo...");
         try {
-            // El orden importa por las claves foráneas: primero préstamos, luego el resto
             lendDAO.deleteAllLends(); 
             userDAO.deleteAllUsers();
             resourceDAO.deleteAllResources();
@@ -108,22 +108,19 @@ public class Main {
 
                 case 4:
                     System.out.println("\nRegistering lend for '1984' to Mario...");
-                    Lend l1 = new Lend(book1, reader);
                     reader.getHistory().addLend(l1);
                     try {
-                        // Primero intentamos guardar el préstamo
                         lendDAO.addLend(l1);
                         System.out.println("Lend saved to MySQL.");
 
-                        // Intentamos guardar el usuario, pero si ya existe, capturamos el error
                         try {
                             userDAO.saveUser(reader);
                             System.out.println("User saved to MySQL.");
                         } catch (SQLException e) {
-                            if (e.getErrorCode() == 1062) { // 1062 es el código de MySQL para "Duplicate entry"
+                            if (e.getErrorCode() == 1062) { // 1062 code of MySQL for "Duplicate entry"
                                 System.out.println("Note: User already exists in DB, skipping save.");
                             } else {
-                                throw e; // Si es otro error, lo lanzamos
+                                throw e;
                             }
                         }
 
@@ -137,9 +134,7 @@ public class Main {
 
                 case 5:
                     System.out.println("\nReturning '1984'...");
-                    // Aquí podrías buscar el préstamo activo, pero para la demo usamos l1
-                    // Suponiendo que l1 existe:
-                    // l1.checkReturned();
+                    l1.checkReturned();
                     System.out.println("Resource marked as returned.");
                     break;
 
