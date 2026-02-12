@@ -135,6 +135,11 @@ public class Main {
                 case 5:
                     System.out.println("\nReturning '1984'...");
                     l1.checkReturned();
+                    try {
+                        lendDAO.markAsReturned(l1);
+                     } catch (SQLException | ClassNotFoundException e) {
+                        System.out.println("Database error: " + e.getMessage());
+                    }
                     System.out.println("Resource marked as returned.");
                     break;
 

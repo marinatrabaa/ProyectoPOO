@@ -79,13 +79,13 @@ public class LendDAO{
             }
         } else {
             // Fallback: updates latest lend for that user+resource
-            String sql = "UPDATE lends SET returned = true WHERE resource_id = ? AND user_id = ? AND returned = 0 ORDER BY start_date DESC LIMIT 1";
+            String sql = "UPDATE lends SET returned = true WHERE resource_id = ? AND user_id = ? AND returned = false ORDER BY start_date DESC LIMIT 1";
             try (Connection conn = DBConection.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, lend.getResource().getId());
                 stmt.setString(2, lend.getUser().getId());
-                //int rowsUpdated = stmt.executeUpdate();
-                //System.out.println("DEBUG: markAsReturned - fallback by user+resource, Rows updated: " + rowsUpdated);
+                int rowsUpdated = stmt.executeUpdate();
+                System.out.println("DEBUG: markAsReturned - fallback by user+resource, Rows updated: " + rowsUpdated);
             } catch(SQLException e){
                 System.err.println("Error retrieving lends: " + e.getMessage());
                 e.printStackTrace();
