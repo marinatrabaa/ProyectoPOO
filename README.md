@@ -394,4 +394,4 @@ erDiagram
         date finish_date
         boolean returned
     }
-    ```
+```
